@@ -1,0 +1,12 @@
+#list{
+    list-style: none;
+}
+
+.listaItem{
+    display: flex;
+}
+
+.tachado{
+    text-decoration: line-through;
+    color: gray;
+}
