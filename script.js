@@ -1,38 +1,60 @@
 let todo = [];
 
-const crearCheckbox = (item) => {
-    let checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.id = todo.lastIndexOf(item);
-    checkbox.classList.add("form-check-input");
-    checkbox.addEventListener("click", touchCheckbox);
-    return checkbox;
+const crearCheckbox = (item) => `<input type="checkbox" id="${todo.lastIndexOf(item)}" class="form-check-input" onclick="touchCheckbox(this)" ${item.chequeado ? "checked" : ""}>`;
+const crearDiv = (item) => {
+    if(item.chequeado)
+        return `<div id="listaItem${todo.lastIndexOf(item)}" class="listaItem tachado">${crearCheckbox(item)}<p>${item.tarea} (Creado: ${item.timestamp.toDateString()})</p></div>`;
+    else
+        return `<div id="listaItem${todo.lastIndexOf(item)}" class="listaItem">${crearCheckbox(item)}<p>${item.tarea} (Creado: ${item.timestamp.toDateString()})</p></div>`
 }
-
 function AñadirItem(){
     const input = document.querySelector("#item");
     const list = document.querySelector("#list");
     const item = input.value;
     input.value = "";
 
-    if(!item || !item.match(/[^\W]/)) return; // no añadir items vacíos
-    todo.push(item);
+    if(!item || !item.match(/[^\W]/)) return; // no añadir items vacíos, amamos regex
+    todo.push({
+        tarea: item,
+        timestamp: new Date(),
+        timestampChequeado: null,
+        chequeado: false,
+    });
 
-    let nuevoNodo = document.createElement("p");
-    let checkbox = crearCheckbox(item);
-
-    nuevoNodo.innerHTML = item;
-
-    let div = document.createElement("div");
-    div.classList.add("listaItem");
-    div.id = "listaItem" + todo.lastIndexOf(item);
-
-    div.appendChild(checkbox);
-    div.appendChild(nuevoNodo);
-    list.appendChild(div); // se añade un nuevo nodo a la lista
+    list.innerHTML = "";
+    for(let i = 0; i < todo.length; i++){
+        list.innerHTML += crearDiv(todo[i]);
+    }
 }
 
-function touchCheckbox(e){
-    if(e.target.checked) document.querySelector(`#listaItem${e.target.id}`).classList.add("tachado");
-    else document.querySelector(`#listaItem${e.target.id}`).classList.remove("tachado");
+function touchCheckbox(el){
+    if(el.checked){
+        document.querySelector(`#listaItem${el.id}`).classList.add("tachado");
+        todo[el.id].chequeado = true;
+        todo[el.id].timestampChequeado = new Date();
+    } else {
+        document.querySelector(`#listaItem${el.id}`).classList.remove("tachado");
+        todo[el.id].chequeado = false;
+        todo[el.id].timestampChequeado = null;
+    }
+}
+
+function mostrarTareaRapida(){
+    const par = document.querySelector("#tarearapida");
+    if(todo.filter(item => item.chequeado).length == 0){
+        par.textContent = "Aún no hay ninguna tarea resuelta";
+        return;
+    }
+
+    let minTarea = "";
+    let minTiempo = Number.MAX_VALUE;
+
+    for(let i = 0; i < todo.length; i++){
+        if(todo[i].timestampChequeado - todo[i].timestamp < minTiempo){
+            minTiempo = todo[i].timestampChequeado - todo[i].timestamp;
+            minTarea = todo[i].tarea;
+        }
+    }
+
+    par.textContent = `La tarea que más rápido se ha concretado fue: ${minTarea}`;
 }
