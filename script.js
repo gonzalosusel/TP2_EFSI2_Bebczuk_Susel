@@ -41,7 +41,8 @@ function touchCheckbox(el){
 
 function mostrarTareaRapida(){
     const par = document.querySelector("#tarearapida");
-    if(todo.filter(item => item.chequeado).length == 0){
+    let tareasCompletadas = todo.filter(item => item.chequeado);
+    if(tareasCompletadas.length == 0){
         par.textContent = "Aún no hay ninguna tarea resuelta";
         return;
     }
@@ -49,10 +50,10 @@ function mostrarTareaRapida(){
     let minTarea = "";
     let minTiempo = Number.MAX_VALUE;
 
-    for(let i = 0; i < todo.length; i++){
-        if(todo[i].timestampChequeado - todo[i].timestamp < minTiempo){
-            minTiempo = todo[i].timestampChequeado - todo[i].timestamp;
-            minTarea = todo[i].tarea;
+    for(let i = 0; i < tareasCompletadas.length; i++){
+        if(tareasCompletadas[i].timestampChequeado - tareasCompletadas[i].timestamp < minTiempo){
+            minTiempo = tareasCompletadas[i].timestampChequeado - tareasCompletadas[i].timestamp;
+            minTarea = tareasCompletadas[i].tarea;
         }
     }
 
